@@ -28,6 +28,6 @@ class CompaniesAPIView(APIView):
             recruitments.save()
             return Response(recruitments.data, status=status.HTTP_200_OK)
         
-        return Response({"message" : "채용공고 수정 실패!"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(recruitments.errors, status=status.HTTP_400_BAD_REQUEST)
 
         
