@@ -19,3 +19,15 @@ class CompaniesAPIView(APIView):
         
         return Response(recruitments.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    # 채용공고 수정
+    def put(self, request):
+        old_recruitments = RecruitmentsModel.objects.get(id=request.data["id"])
+        recruitments = RecruitmentsChangeSerializer(old_recruitments, data=request.data, partial=True)
+        
+        if recruitments.is_valid():
+            recruitments.save()
+            return Response(recruitments.data, status=status.HTTP_200_OK)
+        
+        return Response({"message" : "채용공고 수정 실패!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        
