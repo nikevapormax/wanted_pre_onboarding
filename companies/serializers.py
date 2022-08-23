@@ -20,7 +20,7 @@ class RecruitmentsChangeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data.get("company"):
             data.pop("company")
-        print(data)
+
         return data
     
     def update(self, instance, validated_data):
