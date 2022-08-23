@@ -135,3 +135,29 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         self.assertEqual(response_1.data["recruit_compensation"], 5000000000)
         self.assertEqual(response_1.data["contents"], "요기요에서 백엔드 시니어 개발자를 채용합니다. 많관부!")
         self.assertEqual(response_1.data["skill"], "Django")
+        
+    # 채용공고 수정 테스트 (실패)
+    def test_revise_register_fail(self):
+        url = reverse("companies")
+        data = {
+            "id" : 1,
+            "company" : 1,
+            "position" : "프론트엔드 시니어 개발자 개발자 개발자 개발자 개발자 개발자 개발자",
+            "recruit_compensation" : 500000,
+            "contents" : "배달의민족에서 프론트엔드 시니어 개발자를 채용합니다. 많관부!",
+            "skill" : "Vue.js",
+        }
+        data_1 = {
+            "id" : 2,
+            "company" : 2,
+            "position" : "백엔드 주니어 개발자",
+            "recruit_compensation" : 50000000000000000,
+            "contents" : "요기요에서 백엔드 시니어 개발자를 채용합니다. 많관부!",
+            "skill" : "DjangoDjangoDjangoDjangoDjangoDjangoDjangoDjangoDjango",
+        }
+        
+        response = self.client.put(url, data)
+        response_1 = self.client.put(url, data_1)
+        
+        self.assertEqual(response.data["position"][0], "Ensure this field has no more than 30 characters.")
+        self.assertEqual(response_1.data["skill"][0], "Ensure this field has no more than 30 characters.")
