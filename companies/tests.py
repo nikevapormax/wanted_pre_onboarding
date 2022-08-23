@@ -46,3 +46,37 @@ class RecruitmentsTest(APITestCase):
         self.assertEqual(response_2.data["recruit_compensation"], 1000000)
         self.assertEqual(response_3.data["company"], 3)
         self.assertEqual(response_3.data["contents"], "삼성에서 프론트엔드 시니어 개발자를 채용합니다. 많관부!")
+        
+    # 채용공고 등록 테스트 (실패)
+    def test_register_recruitments_not_enough_info(self):
+        url = reverse("companies")
+        data = {
+            "company" : "",
+            "position" : "백엔드 시니어 개발자",
+            "recruit_compensation" : "500000",
+            "contents" : "배달의민족에서 백엔드 시니어 개발자를 채용합니다. 많관부!",
+            "skill" : "Django",
+        }
+        data_2 = {
+            "company" : 2,
+            "position" : "",
+            "recruit_compensation" : "1000000",
+            "contents" : "엘지에서 백엔드 주니어 개발자를 채용합니다. 많관부!",
+            "skill" : "Python",
+        }
+        data_3 = {
+            "company" : 3,
+            "position" : "프론트엔드 시니어 개발자",
+            "recruit_compensation" : "",
+            "contents" : "",
+            "skill" : "Vue.js",
+        }
+        
+        response = self.client.post(url, data)
+        response_2 = self.client.post(url, data_2)
+        response_3 = self.client.post(url, data_3)
+        
+        self.assertEqual(response.data["company"][0], "This field may not be null.")
+        self.assertEqual(response_2.data["position"][0], "This field may not be blank.")
+        self.assertEqual(response_3.data["recruit_compensation"][0], "A valid integer is required.")
+        self.assertEqual(response_3.data["contents"][0], "This field may not be blank.")
