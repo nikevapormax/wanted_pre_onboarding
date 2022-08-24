@@ -161,3 +161,35 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         
         self.assertEqual(response.data["position"][0], "Ensure this field has no more than 30 characters.")
         self.assertEqual(response_1.data["skill"][0], "Ensure this field has no more than 30 characters.")
+        
+    # 채용공고 삭제 테스트 (성공)
+    def test_delete_register(self):
+        url = reverse("companies")
+        data = {
+            "id" : 1
+        }
+        data_1 = {
+            "id" : 2
+        }
+        
+        response = self.client.delete(url, data)
+        response_1 = self.client.delete(url, data_1)
+        
+        self.assertEqual(response.data["message"], "채용공고 삭제 성공!")
+        self.assertEqual(response_1.data["message"], "채용공고 삭제 성공!")
+
+    # 채용공고 삭제 테스트 (실패)
+    def test_delete_register(self):
+        url = reverse("companies")
+        data = {
+            "id" : 3
+        }
+        data_1 = {
+            "id" : 10
+        }
+        
+        response = self.client.delete(url, data)
+        response_1 = self.client.delete(url, data_1)
+        
+        self.assertEqual(response.data["message"], "채용공고가 존재하지 않습니다.")
+        self.assertEqual(response_1.data["message"], "채용공고가 존재하지 않습니다.")
