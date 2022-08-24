@@ -220,3 +220,12 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         
         self.assertEqual(response.data["message"], "채용공고가 존재하지 않습니다.")
         self.assertEqual(response_1.data["message"], "채용공고가 존재하지 않습니다.")
+        
+    # 채용공고 조회 테스트
+    def test_lookup_recruitments(self):
+        url = reverse("companies")
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["company_name"], "배달의민족")
+        self.assertEqual(response.data[1]["position"], "백엔드 주니어 개발자")
