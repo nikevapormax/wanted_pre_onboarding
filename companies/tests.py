@@ -9,14 +9,14 @@ class RecruitmentsTest(APITestCase):
         company_data = ["배달의민족", "요기요", "삼성", "엘지"]
         for company in company_data:
             cls.company = CompanyModel.objects.create(company_name=company)
-        
-        cls.company.save()
-    
+
     # 채용공고 등록 테스트 (성공)
     def test_register_recruitments(self):
         url = reverse("companies")
         data = {
             "company" : 1,
+            "country" : "한국",
+            "region" : "강남",
             "position" : "백엔드 시니어 개발자",
             "recruit_compensation" : "500000",
             "contents" : "배달의민족에서 백엔드 시니어 개발자를 채용합니다. 많관부!",
@@ -24,6 +24,8 @@ class RecruitmentsTest(APITestCase):
         }
         data_2 = {
             "company" : 4,
+            "country" : "한국",
+            "region" : "마포",
             "position" : "백엔드 주니어 개발자",
             "recruit_compensation" : "1000000",
             "contents" : "엘지에서 백엔드 주니어 개발자를 채용합니다. 많관부!",
@@ -31,6 +33,8 @@ class RecruitmentsTest(APITestCase):
         }
         data_3 = {
             "company" : 3,
+            "country" : "한국",
+            "region" : "수원",
             "position" : "프론트엔드 시니어 개발자",
             "recruit_compensation" : "500000",
             "contents" : "삼성에서 프론트엔드 시니어 개발자를 채용합니다. 많관부!",
@@ -53,6 +57,8 @@ class RecruitmentsTest(APITestCase):
         url = reverse("companies")
         data = {
             "company" : "",
+            "country" : "",
+            "region" : "강남",
             "position" : "백엔드 시니어 개발자",
             "recruit_compensation" : "500000",
             "contents" : "배달의민족에서 백엔드 시니어 개발자를 채용합니다. 많관부!",
@@ -60,6 +66,8 @@ class RecruitmentsTest(APITestCase):
         }
         data_2 = {
             "company" : 2,
+            "country" : "한국",
+            "region" : "",
             "position" : "",
             "recruit_compensation" : "1000000",
             "contents" : "엘지에서 백엔드 주니어 개발자를 채용합니다. 많관부!",
@@ -67,6 +75,8 @@ class RecruitmentsTest(APITestCase):
         }
         data_3 = {
             "company" : 3,
+            "country" : "한국",
+            "region" : "강남",
             "position" : "프론트엔드 시니어 개발자",
             "recruit_compensation" : "",
             "contents" : "",
@@ -78,7 +88,9 @@ class RecruitmentsTest(APITestCase):
         response_3 = self.client.post(url, data_3)
         
         self.assertEqual(response.data["company"][0], "This field may not be null.")
+        self.assertEqual(response.data["country"][0], "This field may not be blank.")
         self.assertEqual(response_2.data["position"][0], "This field may not be blank.")
+        self.assertEqual(response_2.data["region"][0], "This field may not be blank.")
         self.assertEqual(response_3.data["recruit_compensation"][0], "A valid integer is required.")
         self.assertEqual(response_3.data["contents"][0], "This field may not be blank.")
 
@@ -90,10 +102,10 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         for company in company_data:
             cls.company = CompanyModel.objects.create(company_name=company)
         
-        cls.company.save()
-        
         cls.recruitments = RecruitmentsModel.objects.create(
             company=CompanyModel.objects.get(id=1),
+            country="한국",
+            region="강남",
             position="프론트엔드 주니어 개발자",
             recruit_compensation=500000,
             contents="배달의민족에서 프론트엔드 주니어 개발자를 채용합니다!",
@@ -101,18 +113,22 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         )
         cls.recruitments_1 = RecruitmentsModel.objects.create(
             company=CompanyModel.objects.get(id=2),
+            country="한국",
+            region="선릉",
             position="백엔드 주니어 개발자",
             recruit_compensation=1500000,
             contents="요기요에서 백엔드 주니어 개발자를 채용합니다!",
             skill="Python"
         )
-        
+
     # 채용공고 수정 테스트 (성공)
     def test_revise_register(self):
         url = reverse("companies")
         data = {
             "id" : 1,
             "company" : 1,
+            "country" : "미국",
+            "region" : "실리콘밸리",
             "position" : "프론트엔드 시니어 개발자",
             "recruit_compensation" : 500000,
             "contents" : "배달의민족에서 프론트엔드 시니어 개발자를 채용합니다. 많관부!",
@@ -121,6 +137,8 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         data_1 = {
             "id" : 2,
             "company" : 2,
+            "country" : "한국",
+            "region" : "강남",
             "position" : "백엔드 주니어 개발자",
             "recruit_compensation" : 5000000000,
             "contents" : "요기요에서 백엔드 시니어 개발자를 채용합니다. 많관부!",
@@ -130,8 +148,11 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         response = self.client.put(url, data)
         response_1 = self.client.put(url, data_1)
         
+        self.assertEqual(response.data["country"], "미국")
+        self.assertEqual(response.data["region"], "실리콘밸리")
         self.assertEqual(response.data["position"], "프론트엔드 시니어 개발자")
         self.assertEqual(response.data["contents"], "배달의민족에서 프론트엔드 시니어 개발자를 채용합니다. 많관부!")
+        self.assertEqual(response_1.data["region"], "강남")
         self.assertEqual(response_1.data["recruit_compensation"], 5000000000)
         self.assertEqual(response_1.data["contents"], "요기요에서 백엔드 시니어 개발자를 채용합니다. 많관부!")
         self.assertEqual(response_1.data["skill"], "Django")
@@ -142,6 +163,8 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         data = {
             "id" : 1,
             "company" : 1,
+            "country" : "한국남아프리카공화국미국중국크로아티아영국프랑스포르투갈그린란드이탈리아",
+            "region" : "강남",
             "position" : "프론트엔드 시니어 개발자 개발자 개발자 개발자 개발자 개발자 개발자",
             "recruit_compensation" : 500000,
             "contents" : "배달의민족에서 프론트엔드 시니어 개발자를 채용합니다. 많관부!",
@@ -150,6 +173,8 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         data_1 = {
             "id" : 2,
             "company" : 2,
+            "country" : "한국",
+            "region" : "강남강서강북마포중구중랑구서대문구안양의왕수원인덕원비산동과천시은평구",
             "position" : "백엔드 주니어 개발자",
             "recruit_compensation" : 50000000000000000,
             "contents" : "요기요에서 백엔드 시니어 개발자를 채용합니다. 많관부!",
@@ -159,7 +184,9 @@ class RecruitmentsReviseOrDeleteTest(APITestCase):
         response = self.client.put(url, data)
         response_1 = self.client.put(url, data_1)
         
+        self.assertEqual(response.data["country"][0], "Ensure this field has no more than 20 characters.")
         self.assertEqual(response.data["position"][0], "Ensure this field has no more than 30 characters.")
+        self.assertEqual(response_1.data["region"][0], "Ensure this field has no more than 15 characters.")
         self.assertEqual(response_1.data["skill"][0], "Ensure this field has no more than 30 characters.")
         
     # 채용공고 삭제 테스트 (성공)
