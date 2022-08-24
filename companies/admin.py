@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Company as CompanyModel
+from .models import Recruitments as RecruitmentsModel
+
+
+admin.site.register(CompanyModel)
+admin.site.register(RecruitmentsModel)
