@@ -7,6 +7,7 @@ from .models import Recruitments as RecruitmentsModel
 from .serializers import RecruitmentsSerializer
 from .serializers import RecruitmentsChangeSerializer
 from .serializers import RecruitmentsLookupSeriailizer
+from .serializers import RecruitmentsDetailSerializer
 
 
 class CompaniesAPIView(APIView):
@@ -99,3 +100,11 @@ class RecruitmentsSearchView(APIView):
             else:
                 return Response({"message" : "검색 결과가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
             
+
+class RecruitmentsDetailView(APIView):
+    # 채용공고 상세 페이지
+    def get(self, request, id):
+        recruitments = RecruitmentsModel.objects.get(id=id)
+        recruitments_data = RecruitmentsDetailSerializer(recruitments)
+        
+        return Response(recruitments_data.data, status=status.HTTP_200_OK)
