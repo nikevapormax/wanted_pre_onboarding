@@ -53,7 +53,12 @@ class RecruitmentsDetailSerializer(serializers.ModelSerializer):
         company_info = obj.company.company_name
         info = RecruitmentsModel.objects.filter(company__company_name=company_info)
         
-        return info.values_list("id")
+        list = []
+        for i in info.values("id"):
+            if i["id"] != obj.company.id:
+                list.append(i["id"])
+        
+        return list
     
     class Meta:
         model = RecruitmentsModel
