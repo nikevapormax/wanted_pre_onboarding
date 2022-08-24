@@ -52,10 +52,10 @@ class RecruitmentsDetailSerializer(serializers.ModelSerializer):
     def get_other_recruitments(self, obj):
         company_info = obj.company.company_name
         info = RecruitmentsModel.objects.filter(company__company_name=company_info)
-        
+
         list = []
         for i in info.values("id"):
-            if i["id"] != obj.company.id:
+            if i["id"] != obj.id:
                 list.append(i["id"])
         
         return list
