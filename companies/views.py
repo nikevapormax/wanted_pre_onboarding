@@ -49,3 +49,53 @@ class CompaniesAPIView(APIView):
         except:
             return Response({"message": "채용공고가 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         
+
+class RecruitmentsSearchView(APIView):
+    # 검색어를 통한 채용공고 검색
+    def get(self, request):
+        param = request.query_params.get("search")
+        
+        if not param:
+            return Response({"message" : "검색 결과가 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            if int(param) >= 500000:
+                data = RecruitmentsModel.objects.filter(recruit_compensation__gte=int(param))
+
+                if data.exists():
+                    serialized_data = RecruitmentsLookupSeriailizer(data, many=True)
+                    return Response(serialized_data.data, status=status.HTTP_200_OK)
+                else:
+                    return Response({"message" : "검색 결과가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                data = RecruitmentsModel.objects.filter(id=int(param))
+
+                if data.exists():
+                    serialized_data = RecruitmentsLookupSeriailizer(data, many=True)
+                    return Response(serialized_data.data, status=status.HTTP_200_OK)
+                else:
+                    return Response({"message" : "검색 결과가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            if RecruitmentsModel.objects.filter(company__company_name__icontains=param):
+                data = RecruitmentsModel.objects.filter(company__company_name__icontains=param)
+                serialized_data = RecruitmentsLookupSeriailizer(data, many=True)
+                return Response(serialized_data.data, status=status.HTTP_200_OK)
+            elif RecruitmentsModel.objects.filter(country__icontains=param):
+                data = RecruitmentsModel.objects.filter(country__icontains=param)
+                serialized_data = RecruitmentsLookupSeriailizer(data, many=True)
+                return Response(serialized_data.data, status=status.HTTP_200_OK)
+            elif RecruitmentsModel.objects.filter(region__icontains=param):
+                data = RecruitmentsModel.objects.filter(region__icontains=param)
+                serialized_data = RecruitmentsLookupSeriailizer(data, many=True)
+                return Response(serialized_data.data, status=status.HTTP_200_OK)
+            elif RecruitmentsModel.objects.filter(position__icontains=param):
+                data = RecruitmentsModel.objects.filter(position__icontains=param)
+                serialized_data = RecruitmentsLookupSeriailizer(data, many=True)
+                return Response(serialized_data.data, status=status.HTTP_200_OK)
+            elif RecruitmentsModel.objects.filter(skill__icontains=param):
+                data = RecruitmentsModel.objects.filter(skill__icontains=param)
+                serialized_data = RecruitmentsLookupSeriailizer(data, many=True)
+                return Response(serialized_data.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"message" : "검색 결과가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+            
