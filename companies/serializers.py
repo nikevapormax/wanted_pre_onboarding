@@ -8,14 +8,14 @@ class RecruitmentsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = RecruitmentsModel
-        fields = ["company", "position", "recruit_compensation", "contents", "skill"]
+        fields = ["company", "country", "region", "position", "recruit_compensation", "contents", "skill"]
     
 
 class RecruitmentsChangeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = RecruitmentsModel
-        fields = ["company", "position", "recruit_compensation", "contents", "skill"]
+        fields = ["company", "country", "region", "position", "recruit_compensation", "contents", "skill"]
     
     def validate(self, data):
         if data.get("company"):
@@ -29,3 +29,14 @@ class RecruitmentsChangeSerializer(serializers.ModelSerializer):
         instance.save()
         
         return instance
+    
+
+class RecruitmentsLookupSeriailizer(serializers.ModelSerializer):
+    company_name = serializers.SerializerMethodField()
+    
+    def get_company_name(self, obj):
+        return obj.company.company_name
+    
+    class Meta:
+        model = RecruitmentsModel
+        fields = ["id", "company_name", "country", "region", "position", "recruit_compensation", "skill"]
