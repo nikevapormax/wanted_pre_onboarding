@@ -40,3 +40,21 @@ class RecruitmentsLookupSeriailizer(serializers.ModelSerializer):
     class Meta:
         model = RecruitmentsModel
         fields = ["id", "company_name", "country", "region", "position", "recruit_compensation", "skill"]
+        
+        
+class RecruitmentsDetailSerializer(serializers.ModelSerializer):
+    company_name = serializers.SerializerMethodField()
+    other_recruitments = serializers.SerializerMethodField()
+    
+    def get_company_name(self, obj):
+        return obj.company.company_name
+    
+    def get_other_recruitments(self, obj):
+        company_info = obj.company.company_name
+        info = RecruitmentsModel.objects.filter(company__company_name=company_info)
+        
+        return info.values_list("id")
+    
+    class Meta:
+        model = RecruitmentsModel
+        fields = ["id", "company_name", "country", "region", "position", "recruit_compensation", "contents", "skill", "other_recruitments"]
