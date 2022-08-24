@@ -10,6 +10,8 @@ class Company(models.Model):
 
 class Recruitments(models.Model):
     company = models.ForeignKey(Company, verbose_name="회사명", on_delete=models.CASCADE)
+    country = models.CharField("국가", max_length=20)
+    region = models.CharField("지역", max_length=15)
     position = models.CharField("채용포지션", max_length=30)
     recruit_compensation = models.IntegerField("채용보상금")
     contents = models.TextField("채용내용")
