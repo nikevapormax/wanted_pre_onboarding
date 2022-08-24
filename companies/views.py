@@ -6,9 +6,17 @@ from rest_framework import status
 from .models import Recruitments as RecruitmentsModel
 from .serializers import RecruitmentsSerializer
 from .serializers import RecruitmentsChangeSerializer
-from companies import serializers
+from .serializers import RecruitmentsLookupSeriailizer
 
-class CompaniesAPIView(APIView):    
+
+class CompaniesAPIView(APIView):
+    # 채용공고 조회
+    def get(self, request):
+        all_recruitments = RecruitmentsModel.objects.all()
+        all_recruitments_data = RecruitmentsLookupSeriailizer(all_recruitments, many=True)
+        
+        return Response(all_recruitments_data.data, status=status.HTTP_200_OK)
+    
     # 채용공고 등록
     def post(self, request):
         recruitments = RecruitmentsSerializer(data=request.data)
